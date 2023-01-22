@@ -24,9 +24,9 @@ contract SupplyChain{
 
     string[] private accepted_products;
 
-    // event order(uint256 indexed time, uint maliyet);
-    // event ok(bool kalite, uint256 indexed time, address indexed tedarikci, address indexed fabrika, uint maliyet);
-    // event back(bool kalite, uint256 indexed time, address indexed tedarikci, address indexed fabrika, uint maliyet);
+    event order(uint256 indexed time, uint _amount);
+    event ok(bool quality, uint256 indexed time, address indexed _to, address indexed _from, uint _amount);
+    event back(bool quality, uint256 indexed time, address indexed _from, uint _amount);
 
 
 
@@ -34,6 +34,8 @@ contract SupplyChain{
     function toOrder() payable external{
         require(msg.value > 0, "cannot zero");
         balance[msg.sender] += msg.value;
+
+        emit order(block.timestamp, msg.value);
     }
 
 
@@ -44,6 +46,8 @@ contract SupplyChain{
 
         accepted_products.push(_name);
 
+        emit ok(_quality, block.timestamp, _to, msg.sender, _amount);
+
     }
 
     function reject(uint _amount, bool _quality)payable external{
@@ -52,6 +56,7 @@ contract SupplyChain{
         balance[msg.sender] -= _amount;
         payable(msg.sender).transfer(_amount);
 
+        emit back(_quality, block.timestamp,msg.sender, _amount);
 
     }
 
